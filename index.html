@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CharacterTrade</title>
+</head>
+<body>
+    <h1>Login to your account</h1>
+    <button name="butt1">Login</button>
+    <p>If no account register</p>
+    <button name="butt2">Register</button>
+
+
+    <script>
+        const heading = documetn.querySelector('h1')
+        const button1 = documetn.querySelector('butt1')
+        const button2 = documetn.querySelector('butt2')
+
+        button1.addEventListener('click', () => {
+            fetch('http://localhost:4000/login')
+        })
+
+
+    </script>
+</body>
+</html>
