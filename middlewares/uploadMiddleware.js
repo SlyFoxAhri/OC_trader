@@ -1,0 +1,41 @@
+// middlewares/uploadMiddleware.js
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+
+// Ensure the target physical upload folder directory path exists on the disk
+const uploadDir = path.join(__dirname, '../uploads');
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+// Set up storage configuration
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, uploadDir);
+    },
+    filename: function (req, file, cb) {
+        // Generate a clean timestamped filename to prevent duplication conflicts
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const ext = path.extname(file.originalname);
+        cb(null, `oc-${uniqueSuffix}${ext}`);
+    }
+});
+
+// File validation filter layer
+const fileFilter = (req, file, cb) => {
+    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (allowedMimeTypes.includes(file.mimetype)) {
+        cb(null, true);
+    } else {
+        cb(new Error('INVALID_FILE_TYPE'), false);
+    }
+};
+
+const upload = multer({
+    storage: storage,
+    fileFilter: fileFilter,
+    limits: { fileSize: 5 * 1024 * 1024 } // 5 MegaBytes maximum allocation
+});
+
+module.exports = upload;

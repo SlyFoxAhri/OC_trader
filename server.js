@@ -2,6 +2,8 @@
 const express = require('express');
 const authRoutes = require('./routes/authRoutes');
 const characterRoutes = require('./routes/characterRoutes');
+const fileRoutes = require('./routes/fileRoutes');
+const tradeRoutes = require('./routes/tradeRoutes');
 
 const app = express();
 app.use(express.json());
@@ -15,6 +17,9 @@ app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({ error: 'Something went wrong internally! :/' });
 });
+
+app.use('/api', fileRoutes);
+app.use('/api/trades', tradeRoutes);
 
 const PORT = 4000;
 app.listen(PORT, () => {
