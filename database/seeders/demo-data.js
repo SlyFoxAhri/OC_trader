@@ -5,7 +5,7 @@ const bcrypt = require('bcryptjs');
 
 async function seedDatabase() {
     try {
-        console.log('🌱 Seeding sample data...');
+        console.log('Seeding sample data...');
 
         // 1. Seed Roles
         const adminRole = await Role.create({ name: 'admin' });
@@ -69,13 +69,13 @@ async function seedDatabase() {
             userId: regularUser1.id
         });
 
-        console.log('🚀 Seeding complete! Test accounts ready:');
-        console.log('   Admin: admin@ochub.com (admin123)');
-        console.log('   User 1: alice@ochub.com (user123)');
-        console.log('   User 2: bob@ochub.com (user456)');
+        console.log('Seeding complete! Test accounts ready:');
+        console.log('Admin: admin@ochub.com (admin123)');
+        console.log('User 1: alice@ochub.com (user123)');
+        console.log('User 2: bob@ochub.com (user456)');
 
     } catch (error) {
-        console.error('❌ Error seeding database:', error);
+        console.error('Error seeding database:', error);
     }
 }
 

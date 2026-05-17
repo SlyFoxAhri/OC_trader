@@ -1,15 +1,15 @@
-// models/index.js
+//create
 const sequelize = require('../config/database');
 const { DataTypes, Model } = require('sequelize');
 
-// Define Model Classes
+//define
 class Role extends Model {}
 class User extends Model {}
 class Picture extends Model {}
 class Character extends Model {}
 class Trade extends Model {}
 
-// Initialize Models
+//initialize
 Role.init({
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     name: { type: DataTypes.STRING, allowNull: false, unique: true }
@@ -61,23 +61,21 @@ Trade.init({
     }
 }, { sequelize, modelName: 'Trade', tableName: 'trades' });
 
-// ==========================================
-// Define Associations (Relationships)
-// ==========================================
+// =========================================
 
-// User <-> Role (Many-to-One)
+//user - role 
 Role.hasMany(User, { foreignKey: 'roleId' });
 User.belongsTo(Role, { foreignKey: 'roleId', as: 'role' });
 
-// User <-> Character (One-to-Many)
+//user - character
 User.hasMany(Character, { foreignKey: 'userId', as: 'characters' });
 Character.belongsTo(User, { foreignKey: 'userId', as: 'owner' });
 
-// Character <-> Picture (One-to-Many)
+//character - picture
 Character.hasMany(Picture, { foreignKey: 'characterId', as: 'pictures', onDelete: 'CASCADE' });
 Picture.belongsTo(Character, { foreignKey: 'characterId', as: 'character' });
 
-// Trades Associations
+//trades
 User.hasMany(Trade, { foreignKey: 'senderId', as: 'sentTrades' });
 User.hasMany(Trade, { foreignKey: 'receiverId', as: 'receivedTrades' });
 Trade.belongsTo(User, { foreignKey: 'senderId', as: 'sender' });
