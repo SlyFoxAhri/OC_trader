@@ -1,17 +1,14 @@
-// services/authService.js
 const { User, Role } = require('../models/index');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const jwtConfig = require('../config/jwt');
 
 exports.registerUser = async (email, password) => {
-    // Check if user already exists
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
         throw new Error('EMAIL_EXISTS');
     }
 
-    // Get default role
     const defaultRole = await Role.findOne({ where: { name: 'user' } });
     if (!defaultRole) {
         throw new Error('ROLE_NOT_INITIALIZED');

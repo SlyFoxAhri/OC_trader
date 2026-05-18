@@ -5,7 +5,6 @@ const { body } = require('express-validator');
 const tradeController = require('../controllers/tradeController');
 const { authenticateToken } = require('../middlewares/authMiddleware');
 
-// Enforce login for all trading parameters
 router.use(authenticateToken);
 
 const proposeValidation = [

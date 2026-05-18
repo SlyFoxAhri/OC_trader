@@ -1,4 +1,3 @@
-// services/characterService.js
 const { Character, User } = require('../models/index');
 
 exports.createCharacter = async (data, userId) => {
