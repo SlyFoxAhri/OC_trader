@@ -44,8 +44,8 @@ oc-trader/
 ├── routes/
 ├── services/
 ├── uploads/
-├── server.js            # Unified web container bootloader
-└── README.md        #Documentation
+├── server.js      # Unified web container bootloader
+└── README.md      #Documentation
 ```
 
 
