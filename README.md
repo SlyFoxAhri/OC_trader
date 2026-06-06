@@ -34,27 +34,19 @@ Isolated media processing pipelines with multer to safely log full multipart met
 ## Folder Structure
 
 
+```
 oc-trader/ 
-
 ├── config/
-
 ├── controllers/
-
 ├── database/
-
 ├── middlewares/
-
 ├── models/
-
 ├── routes/
-
 ├── services/
-
 ├── uploads/
-
 ├── server.js            # Unified web container bootloader
-
 └── README.md        #Documentation
+```
 
 
 
