@@ -1,37 +1,40 @@
+---
+
 A server side REST API designed for sharing and trading Original Characters (OCs). Built with Node.js, Express, and Sequlize (SQLite), this project demonstrates software engineering concepts including a clean and structured file system, token based authentication, user management, well-designed data model, atomicity, seand error handling.
 
+---
 
 
-## Architecture
+# Architecture
 
 
-### Controller-Service Pattern
+## Controller-Service Pattern
 
-
-Request -> Router -> Middleware -> Controller -> Service -> Database -> Service -> Controller -> Response
 
 Routes only define URL logic. Controllers handle purely HTTP orchestration (request gathering, error-status translations). Services hold all heavy database ORM operations and pure business logic.
 
+>Request -> Router -> Middleware -> Controller -> Service -> Database -> Service -> Controller -> Response
 
-### Database Isolation & Atomicity
+
+## Database Isolation & Atomicity
 
 
 Implements multi-table relations utilizing Sequelize transactions. Transactions execute atomically, completely wrapping target database operations to eliminate duplicate assets or inconsistencies.
 
 
-### Security 
+## Security 
 
 
-Built on custom jsonwebtoken (JWT) middlewares that process authentication alongside flexible Role-Based Access Control (admin vs user) and ownership validity rules.
+Built on custom jsonwebtoken (JWT) middleware that process authentication alongside flexible Role-Based Access Control (admin vs user) and ownership validity rules.
 
 
-### Content Management 
+## Content Management 
 
 Isolated media processing pipelines with multer to safely log full multipart metadata into the database, strictly only serving files according to individual profile visibility rights.
 
 
 
-## Folder Structure
+# Folder Structure
 
 
 ```
@@ -44,122 +47,275 @@ oc-trader/
 ├── routes/
 ├── services/
 ├── uploads/
-├── server.js      # Unified web container bootloader
-└── README.md      #Documentation
+├── server.js      # Unified bootloader
+└── README.md      # Documentation
 ```
 
 
 
-## Database Entity-Relationship
+# Database Entity-Relationship
 
 
-Role: id, name
+**Role**: id, name\
+**User**: id, email, passwordHash, roleId\
+**Character**: id, name, age, gender, likes, dislikes, description, visibility, userId\
+**Picture**: id, originalName, storedName, mimeType, size, uploadDate, characterId\
+**Trade**: id, senderId, recieverId, senderCharacterId, recieverCharacterId, status
 
-User: id, email, passwordHash, roleId
+<br>
 
-Character: id, name, age, gender, likes, dislikes, description, visibility, userId
-
-Picture: id, originalName, storedName, mimeType, size, uploadDate, characterId
-
-Trade: id, senderId, recieverId, senderCharacterId, recieverCharacterId, status
-
-
-### PK -> FK
-
-
-Role.id -> User.roleId
-User.id -> Character.userId
-Character.id -> Picture.characterId
-User.id -> Trade.senderId 
-User.id -> Trade.recieverId
-Character.id -> Trade.senderCharacterId
-Character.id -> Trade.recieverCharacterId
+| Primary-key | -> | Foreign-key |
+|---|---|---|
+|Role.id |->| User.roleId|
+|User.id |->| Character.userId|
+|Character.id |->| Picture.characterId|
+|User.id |->| Trade.senderId |
+|User.id |->| Trade.recieverId|
+|Character.id |->| Trade.senderCharacterId|
+|Character.id |->| Trade.recieverCharacterId|
 
 
 
-## API Endpoint Specifications
+# API Endpoint Specifications
+
+>More at [this link](#examples)
+
+>[!CAUTION]
+>Required header signature:\
+>Authorization: Bearer <JWT_TOKEN>
 
 
-Required header signature:
-Authorization: Bearer <JWT_TOKEN>
+### 🪪Authentication Engine - Public
 
 
-### 🔐Authentication Engine
+>     POST /api/auth/register
+
+>     POST /api/auth/login
 
 
-POST /api/auth/register (Public) - New user account creation with validation.
-
-POST /api/auth/login (Public) - Authenticates credentials and issues signed JWTs.
+### 🐉Character Operations (CRUD) - Protected
 
 
-### 🐉Character Operations (CRUD)
+>     POST /api/characters
+
+>     GET /api/characters
+
+>     GET /api/characters/:id
+
+>     PUT /api/characters/:id
+
+>     DELETE /api/characters/:id
+
+>     PUT /api/characters/:id/admin-private
 
 
-POST /api/characters (Protected) - Creates a new character (ownership binds to user but can be changed later).
-
-GET /api/characters (Protected) - Fetches character stats. Standard accounts get public OCs, Admins override to view all.
-
-GET /api/characters/:id (Protected) - Fetches a single OC (strictly blocks guests if profile is set to private).
-
-PUT /api/characters/:id (Protected) - Conditional edit access. Allowed only for the character owner or system admins.
-
-DELETE /api/characters/:id (Protected) - Completely purges character entries. Restricted to owner or admin accounts.
-
-PUT /api/characters/:id/admin-private (Restricted) - Administrative override route. Empowers an admin to forcibly shift any public profile to private.
+### 🗃️ Media Processing
 
 
-### 🖼️ Media Processing
+>     POST /api/characters/:characterId/upload
+
+>     GET /api/pictures/:id/download 
 
 
-POST /api/characters/:characterId/upload (Protected) - Uploads a character avatar (5MB threshold, image-only format constraint). Generates unique stored keys and stores image in the database.
-
-GET /api/pictures/:id/download (Conditional) - Streams or downloads assets. Evaluates parent profile privacy before allowing file access.
+### 🔄Transactional Exchange System - Protected
 
 
-### 🔄Transactional Exchange System
+>     POST /api/trades
 
+>     GET /api/trades
 
-POST /api/trades (Protected) - Proposes swapping an owned OC for an external user's public OC.
-
-GET /api/trades (Protected) - Compiles incoming or outgoing trade history related to the user.
-
-PUT /api/trades/:id/respond (Protected) - Recipient can provide accepted or rejected flags. Upon acceptance, a swap of ownership happens.
+>     PUT /api/trades/:id/respond
 
 
 
-## Technical Requirements & Installation
+# Technical Requirements & Installation
 
 
-Prerequisites:
-Node.js (v16+) installed.
+Prerequisites:\
+**Node.js (v16+) installed**
 
 Install packages:
+```
 npm init -y 
 npm install express sequelize sqlite3 jsonwebtoken bcryptjs multer express-validator 
+```
 
 Setup test database:
+```
 npm run db:reset
+```
 
-Boot the server
+Boot the server:
+```
 node server.js    #listening at http://localhost:4000.
+```
 
 
+# Accounts for Sandbox Testing
 
-## Accounts for Sandbox Testing
-
-The accounts are created when reseting the database, the file used to poulate the it can be found at database/seeders/demo-data.js
+>[!NOTE]
+>The accounts are created when reseting the database \
+>The file used to poulate the it can be found at **database/seeders/demo-data.js**
 
 
 System Admin Account:
-Email: admin@ochub.com
-Password: admin123
+```
+admin@ochub.com:admin123
+```
 
-Standard Account 1 (Alice):
-Email: alice@ochub.com
-Password: user123
-Assets owned: Character ID 1 (Shadow Weaver - Public)
+User Account 1 (Alice):\
+assets: CharacterID 1 (Shadow Weaver)
+```
+alice@ochub.com:user123
+```
 
-Standard Account 2 (Bob):
-Email: bob@ochub.com
-Password: user456
-Assets owned: Character ID 2 (Sparky - Public)
+User Account 2 (Bob):\
+assets: CharacterID 2 (Sparky)
+```
+bob@ochub.com:user456
+```
+
+---
+
+
+### Examples
+
+>[!NOTE]
+>Required header signature:\
+>Authorization: Bearer <JWT_TOKEN>
+
+---
+
+**🪪 Authentication Engine - Public**
+
+- New user account creation with validation:
+
+    >No header\
+    >     POST /api/auth/register 
+    ```json
+     {
+      "email": "alice@ochub.com",
+      "password": "user123"
+    }
+    ```
+
+- Authenticate credentials and issues signed JWTs:
+
+    >No header\
+    >     POST /api/auth/login
+    ```json
+    {
+      "email": "bob@ochub.com",
+      "password": "user456"
+    }
+    ```
+
+---
+
+***🐉 Character Operations (CRUD) - Protected***
+
+
+- Creates a new character (ownership binds to user but can be changed later):
+
+    >     POST /api/characters
+    ```json
+    {
+      "name": "Crimson Blade",
+      "age": 24,
+      "gender": "Female",
+      "likes": "Swords, Tea",
+      "dislikes": "Dishonesty",
+      "description": "A wandering knight.",
+      "visibility": "public"
+    }
+    ```
+
+- Fetches character stats. Standard accounts get public OCs, Admins override to view all:
+
+    >     GET /api/characters
+
+- Fetches a single OC (strictly blocks guests if profile is set to private):
+
+    >     GET /api/characters/1
+
+- Conditional edit access. Allowed only for the character owner or system admins:
+
+    >     PUT /api/characters/1 
+    ```json
+    {
+      "id": 1,
+      "age": 25,
+      "visibility": "private"
+    }
+    ```
+
+- Completely purges character entries. Restricted to owner or admin accounts:
+
+    >     DELETE /api/characters/1
+
+- Administrative override route. Empowers an admin to forcibly shift any public profile to private (RESTRICTED):
+
+    >     PUT /api/characters/4/admin-private
+ 
+
+---
+
+***🗃️ Media Processing***
+
+
+- Uploads a character avatar (5MB threshold, image-only format constraint). Generates unique stored keys and stores image in the database (PROTECTED):
+
+    >     POST /api/characters/3/upload 
+
+- Streams or downloads assets. Evaluates parent profile privacy before allowing file access (CONDITIONAL):
+
+    >     GET /api/pictures/2/download 
+
+---
+
+***🔄 Transactional Exchange System - Protected***
+
+-Proposes swapping an owned OC for an external user's public OC:
+
+    >     POST /api/trades
+    ```json
+    {
+      "senderCharacterId": 1,
+      "receiverCharacterId": 2
+    }
+    ```
+
+- Compiles incoming or outgoing trade history related to the user:
+
+    >     GET /api/trades
+
+- Recipient can provide accepted or rejected flags. Upon acceptance, a swap of ownership happens:
+
+    >     PUT /api/trades/1/respond
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
