@@ -1,4 +1,4 @@
-odule.exports = (err, req, res, next) => {
+module.exports = (err, req, res, next) => {
     console.error(`[Error]: ${err.message || err}`);
     if (err.stack) console.error(err.stack);
 
